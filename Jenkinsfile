@@ -22,7 +22,8 @@ pipeline {
                     // Tag the Docker image with the Nexus repository URL and push it
                     //sh "docker tag $DOCKER_IMAGE_TAG $NEXUS_REPO_URL/$NEXUS_REPO_NAME/$DOCKER_IMAGE_TAG"
                     //sh "docker login -u $NEXUS_USERNAME -p $NEXUS_PASSWORD $NEXUS_REPO_URL"
-                    sh "docker push localhost:8081/repository/vuejs-dockerized/vuejs-app:latest"
+                    sh "docker push $NEXUS_REPO_URL$NEXUS_REPO_NAME/$DOCKER_IMAGE_TAG"
+
 "
                 }
             }
