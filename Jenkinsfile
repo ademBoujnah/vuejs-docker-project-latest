@@ -21,7 +21,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'nexus-credentials-id1', passwordVariable: 'NEXUS_PASSWORD', usernameVariable: 'NEXUS_USERNAME')]) {
                     // Tag the Docker image with the Nexus repository URL and push it
                     //sh "docker tag $DOCKER_IMAGE_TAG $NEXUS_REPO_URL/$NEXUS_REPO_NAME/$DOCKER_IMAGE_TAG"
-                    //sh "docker login 172.17.0.1:8081 -u $NEXUS_USERNAME -p $NEXUS_PASSWORD "
+                    sh "docker login 172.17.0.1:8081 -u $NEXUS_USERNAME -p $NEXUS_PASSWORD "
                     sh "docker push ${NEXUS_REPO_URL}/${NEXUS_REPO_NAME}/${DOCKER_IMAGE_TAG}"
 
                 }
