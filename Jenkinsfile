@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        NEXUS_REPO_URL = "http://localhost:8081/repository/vuejs-dockerized/"  // Replace with your actual Nexus Repository URL
+        NEXUS_REPO_URL = "http://localhost:8081/repository/vuejs-dockerized"  // Replace with your actual Nexus Repository URL
         NEXUS_REPO_NAME = "vuejs-dockerized"               // Replace with your actual Nexus Repository Name
         DOCKER_IMAGE_TAG = "vuejs-app:latest"
     }
