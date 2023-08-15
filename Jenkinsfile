@@ -20,7 +20,7 @@ pipeline {
             steps {
                 // Authenticate with your Nexus repository using credentials
                 withCredentials([usernamePassword(credentialsId: 'nexus-credentials-id1', passwordVariable: 'NEXUS_PASSWORD', usernameVariable: 'NEXUS_USERNAME')]) {
-                    sh "docker login http:/127.0.0.1:1111 -u $NEXUS_USERNAME -p $NEXUS_PASSWORD"
+                    //sh "docker login http:/127.0.0.1:1111 -u $NEXUS_USERNAME -p $NEXUS_PASSWORD"
                     sh "docker tag $DOCKER_IMAGE_NAME $NEXUS_REPO_URL:adem"
                     sh "docker push $NEXUS_REPO_URL:adem"
                 }
