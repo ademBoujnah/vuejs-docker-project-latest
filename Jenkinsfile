@@ -5,8 +5,8 @@ pipeline {
         NEXUS_REPO_URL = "http://localhost:8081/repository/vuejs-dockerized"  // Replace with your actual Nexus Repository URL
         NEXUS_REPO_NAME = "vuejs-dockerized"               // Replace with your actual Nexus Repository Name
         DOCKER_IMAGE_TAG = "vuejs-app:latest"
-        NEXUS_USERNAME = credentials('nexus-credentials-id1').username
-        NEXUS_PASSWORD = credentials('nexus-credentials-id1').password
+        NEXUS_USERNAME = "credentials('nexus-credentials-id1').username"
+        NEXUS_PASSWORD = "credentials('nexus-credentials-id1').password"
     }
     
     stages {
