@@ -2,10 +2,7 @@ pipeline {
     agent any
     
     environment {
-        NEXUS_REPO_URL = "127.0.0.1:8081/repository/vuejs-dockerized1"  // Replace with your actual Nexus Repository URL
-        NEXUS_REPO_NAME = "vuejs-dockerized1"               // Replace with your actual Nexus Repository Name
-        DOCKER_IMAGE_TAG = "latest"
-        DOCKER_IMAGE_NAME = "vuejs-app"
+        DOCKER_IMAGE_TAG = "ademboujnah/vuejs-app:latest"
     }
     
     stages {
@@ -16,13 +13,12 @@ pipeline {
             }
         }
         
-        stage('Push to Nexus') {
+        stage('Push to Docker Hub') {
             steps {
-                // Authenticate with your Nexus repository using credentials
-                withCredentials([usernamePassword(credentialsId: 'nexus-credentials-id1', passwordVariable: 'NEXUS_PASSWORD', usernameVariable: 'NEXUS_USERNAME')]) {
-                    //sh "docker login http:/127.0.0.1:1111 -u $NEXUS_USERNAME -p $NEXUS_PASSWORD"
-                    sh "docker tag $DOCKER_IMAGE_NAME $NEXUS_REPO_URL:adem"
-                    sh "docker push $NEXUS_REPO_URL:adem"
+                // Authenticate with Docker Hub using credentials
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials-id', passwordVariable: 'DOCKERHUB_PASSWORD', usernameVariable: 'DOCKERHUB_USERNAME')]) {
+                    sh "docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD"
+                    sh "docker push $DOCKER_IMAGE_TAG"
                 }
             }
         }
