@@ -3,6 +3,8 @@ pipeline {
     
     environment {
         DOCKER_IMAGE_TAG = "ademboujnah/vuejs-app:latest"
+        SONARQUBE_SCANNER_HOME = tool name: 'SonarQubeScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+
     }
     
     stages {
@@ -10,6 +12,17 @@ pipeline {
             steps {
                 // Build the Vue.js app in a Docker container
                 sh 'docker build -t $DOCKER_IMAGE_TAG .'
+            }
+        }
+         stage('Code Analysis') {
+            steps {
+                script {
+                    def scannerHome = tool 'SonarQubeScanner'
+                    withSonarQubeEnv('SonarQube') {
+                        // Run SonarQube code analysis
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
+                }
             }
         }
         
