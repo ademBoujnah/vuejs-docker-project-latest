@@ -12,6 +12,7 @@ pipeline {
             steps {
                 // Build the Vue.js app in a Docker container .
                 sh 'docker build -t $DOCKER_IMAGE_TAG .'
+                
             }
         }
          stage('Code Analysis') {
