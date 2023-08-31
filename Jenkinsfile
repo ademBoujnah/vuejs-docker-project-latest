@@ -35,5 +35,15 @@ pipeline {
                 }
             }
         }
+        post {
+        failure {
+            script {
+                emailext subject: "Pipeline Failed: ${currentBuild.fullDisplayName}",
+                         body: "The pipeline '${currentBuild.fullDisplayName}' has failed. Please investigate the issue.",
+                         to: "adem.boujnah@esprit.tn",
+                         mimeType: 'text/html'
+            }
+        }
+    }
     }
 }
