@@ -7,7 +7,7 @@ pipeline {
     }
 
     environment {
-        DOCKER_IMAGE_VERSION = 'V0'
+        DOCKER_IMAGE_VERSION = '1'
         // Define dockerImageTag at the top level
         DOCKER_IMAGE_TAG = ""
         // Define CURRENT_STAGE at the top level
@@ -24,11 +24,12 @@ pipeline {
                  VERSION = sh(script: 'echo $((DOCKER_IMAGE_VERSION.toInteger() + 1))', returnStdout: true).trim()
                   try {
                       sh "docker build -t ${NAME} ."
+                      sh "docker tag ${NAME}:latest ${NAME}:${VERSION}"
             } catch (Exception e) {
                       currentBuild.result = 'FAILURE'
                       error("Build failed: ${e.message}")
             }
-                 sh "docker tag ${NAME}:latest ${NAME}:${VERSION}"
+                 
              }
         }
     }
