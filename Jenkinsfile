@@ -64,12 +64,13 @@ pipeline {
 
     failure {
         script {
+            def failedStageName = currentBuild.rawBuild.getActions(hudson.model.CauseAction).find { it._causes[0].class.simpleName == 'CauseOfInterruption' }._causes[0].shortDescription
             emailext subject: "Pipeline Failed in Stage: ${currentBuild.fullDisplayName}",
-                     body: "The pipeline '${currentBuild.fullDisplayName}' has failed in the '${currentBuild.result}' stage. Please investigate the issue.",
+                     body: "The pipeline '${currentBuild.fullDisplayName}' has failed in the '${failedStageName}' stage. Please investigate the issue.",
                      to: "adem.boujnah@esprit.tn",
                      mimeType: 'text/html'
         }
     }
- }
+}
 
 }
