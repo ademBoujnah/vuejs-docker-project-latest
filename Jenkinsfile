@@ -60,15 +60,29 @@ pipeline {
         script {
             def failedStageName = null
 
-            // Check if the current result is not equal to SUCCESS
-            if (currentBuild.currentResult != hudson.model.Result.SUCCESS) {
-                def failedStage = currentBuild.rawBuild.getCause(hudson.model.Cause$UpstreamCause)
-                if (failedStage) {
-                    failedStageName = failedStage.shortDescription
+            try {
+                // Attempt to capture the failed stage name
+                def failedStage = catchError {
+                    // Placeholder stage with a deliberate error to capture the stage name
+                    stage('Capture Failed Stage') {
+                        steps {
+                            script {
+                                error('Stage failed deliberately to capture its name')
+                            }
+                        }
+                    }
                 }
+
+                if (failedStage) {
+                    failedStageName = failedStage.displayName
+                }
+            } catch (Exception e) {
+                // Handle exceptions
             }
 
-            
+            if (failedStageName == null) {
+                failedStageName = "Unknown"
+            }
 
             emailext subject: "Pipeline Failed in Stage: ${currentBuild.fullDisplayName}",
                      body: "The pipeline '${currentBuild.fullDisplayName}' has failed in the '${failedStageName}' stage. Please investigate the issue.",
