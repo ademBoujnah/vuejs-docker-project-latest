@@ -37,14 +37,16 @@ pipeline {
         }
         
   }
-    post {
-          failure {
-            script {
-                emailext subject: "Pipeline Failed: ${currentBuild.fullDisplayName}",
-                         body: "The pipeline '${currentBuild.fullDisplayName}' has failed. Please investigate the issue.",
-                         to: "adem.boujnah@esprit.tn",
-                         mimeType: 'text/html'
-            }
+  post {
+    failure {
+        script {
+            def failedStage = currentBuild.rawBuild.getCause(hudson.model.Failure.class)?.failedSteps[0]?.context?.get(hudson.model.Cause.UserIdCause.class)?.shortDescription ?: 'Unknown Stage'
+            
+            emailext subject: "Pipeline Failed in Stage: ${failedStage}",
+                     body: "The pipeline '${currentBuild.fullDisplayName}' has failed in the '${failedStage}' stage. Please investigate the issue.",
+                     to: "adem.boujnah@esprit.tn",
+                     mimeType: 'text/html'
         }
     }
+}
 }
