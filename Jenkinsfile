@@ -21,7 +21,6 @@ pipeline {
         stage('Build') {
         steps {
             echo "Running ${VERSION} on ${env.JENKINS_URL}"
-            git branch: "${BRANCH}",  .....
             echo "for brnach ${env.BRANCH_NAME}"
             sh "docker build -t ${NAME} ."
             sh "docker tag ${NAME}:latest ${IMAGE_REPO}/${NAME}:${VERSION}"
