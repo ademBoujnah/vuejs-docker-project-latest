@@ -10,15 +10,14 @@ pipeline {
         // Define CURRENT_STAGE at the top level
         CURRENT_STAGE = ''
         NAME = "ademboujnah/vuejs-app"
-        VERSION = "${VERSION ?: '1'}"    
+        VERSION = "${env.BUILD_ID}"    
     }
 
     stages {
         stage('Build') {
         steps {
              script {
-                 
-                 VERSION = "${VERSION.toInteger() + 1}"
+                 CURRENT_STAGE = 'Build'
                   try {
                       sh "docker build -t ${NAME} ."
                       sh "docker tag ${NAME}:latest ${NAME}:${VERSION}"
