@@ -56,13 +56,20 @@ pipeline {
     }
 
     post {
-        failure {
-            script {
-                emailext subject: "Pipeline Failed: ${currentBuild.fullDisplayName}",
-                         body: "The pipeline '${currentBuild.fullDisplayName}' has failed. Please investigate the issue.",
-                         to: "adem.boujnah@esprit.tn",
-                         mimeType: 'text/html'
-            }
+    always {
+        script {
+            currentBuild.result = currentBuild.result ?: 'SUCCESS'
         }
     }
+
+    failure {
+        script {
+            emailext subject: "Pipeline Failed in Stage: ${currentBuild.fullDisplayName}",
+                     body: "The pipeline '${currentBuild.fullDisplayName}' has failed in the '${currentBuild.currentResult}' stage. Please investigate the issue.",
+                     to: "adem.boujnah@esprit.tn",
+                     mimeType: 'text/html'
+        }
+    }
+ }
+
 }
