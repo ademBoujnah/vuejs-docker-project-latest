@@ -60,8 +60,8 @@ pipeline {
         script {
             def failedStageName = null
 
-            // Check which stage failed by examining the currentBuild.result
-            if (currentBuild.resultIsWorseThan('SUCCESS')) {
+            // Check if the current result is not equal to SUCCESS
+            if (currentBuild.currentResult != hudson.model.Result.SUCCESS) {
                 def failedStage = currentBuild.rawBuild.getCause(hudson.model.Cause$UpstreamCause)
                 if (failedStage) {
                     failedStageName = failedStage.shortDescription
