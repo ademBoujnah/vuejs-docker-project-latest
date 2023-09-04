@@ -11,7 +11,7 @@ pipeline {
         // Define dockerImageTag at the top level
         DOCKER_IMAGE_TAG = ""
         // Define CURRENT_STAGE at the top level
-        CURRENT_STAGE = ''
+        CURRENT_STAGE = 'etat 0'
     }
 
     stages {
@@ -72,6 +72,7 @@ pipeline {
     post {
         failure {
             script {
+                sh "echo $CURRENT_STAGE"
                 def failedStageName = env.CURRENT_STAGE ?: "Unknown"
 
                 emailext subject: "Pipeline Failed in Stage: ${currentBuild.fullDisplayName}",
