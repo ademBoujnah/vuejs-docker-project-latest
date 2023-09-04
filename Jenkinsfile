@@ -48,7 +48,7 @@ pipeline {
                 
                 emailext subject: "Pipeline Failed: ${currentBuild.fullDisplayName}",
                          body: "${errorMessage}\n\nLogs:\n${currentBuild.rawBuild.getLog(200)}",
-                         to: "your@email.com",
+                         to: "adem.boujnah@esprit.tn",
                          mimeType: 'text/html'
             }
         }
