@@ -3,17 +3,21 @@ pipeline {
 
     environment {
         DOCKER_IMAGE_TAG = "ademboujnah/vuejs-app:latest"
+        // Initialize a variable to track the current stage
+        CURRENT_STAGE = ''
     }
 
     stages {
         stage('Build') {
             steps {
                 script {
+                    // Set the current stage name
+                    CURRENT_STAGE = 'Build'
                     try {
                         // Build the Vue.js app in a Docker container.
-                        sh 'docker buildh -t $DOCKER_IMAGE_TAG .'
+                        sh 'docker build -t $DOCKER_IMAGE_TAG .'
                     } catch (Exception e) {
-                        currentBuild.result = 'Build'
+                        currentBuild.result = 'FAILURE'
                         error("Build failed: ${e.message}")
                     }
                 }
@@ -23,6 +27,8 @@ pipeline {
         stage('Code Analysis') {
             steps {
                 script {
+                    // Set the current stage name
+                    CURRENT_STAGE = 'Code Analysis'
                     def scannerHome = tool 'SonarQubeScanner'
                     try {
                         withSonarQubeEnv('SonarQube') {
@@ -30,7 +36,7 @@ pipeline {
                             sh "${scannerHome}/bin/sonar-scanner"
                         }
                     } catch (Exception e) {
-                        currentBuild.result = 'Code Analysis'
+                        currentBuild.result = 'FAILURE'
                         error("Code Analysis failed: ${e.message}")
                     }
                 }
@@ -40,6 +46,8 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
+                    // Set the current stage name
+                    CURRENT_STAGE = 'Push to Docker Hub'
                     try {
                         // Authenticate with Docker Hub using credentials.
                         withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials-id', passwordVariable: 'DOCKERHUB_PASSWORD', usernameVariable: 'DOCKERHUB_USERNAME')]) {
@@ -47,7 +55,7 @@ pipeline {
                             sh "docker push $DOCKER_IMAGE_TAG"
                         }
                     } catch (Exception e) {
-                        currentBuild.result = 'Push to Docker Hub'
+                        currentBuild.result = 'FAILURE'
                         error("Push to Docker Hub failed: ${e.message}")
                     }
                 }
@@ -56,35 +64,16 @@ pipeline {
     }
 
     post {
-    failure {
-        script {
-            def failedStageName = null
+        failure {
+            script {
+                // Use the custom CURRENT_STAGE variable to capture the failed stage name
+                def failedStageName = env.CURRENT_STAGE ?: "Unknown"
 
-            try {
-                // Attempt to capture the failed stage name
-                def currentBuildDescription = currentBuild.description
-
-                if (currentBuildDescription) {
-                    def matcher = (currentBuildDescription =~ /.*\bStage:\s'(.+)'\sfailed.*/)
-
-                    if (matcher.matches()) {
-                        failedStageName = matcher[0][1]
-                    }
-                }
-            } catch (Exception e) {
-                // Handle exceptions
+                emailext subject: "Pipeline Failed in Stage: ${currentBuild.fullDisplayName}",
+                         body: "The pipeline '${currentBuild.fullDisplayName}' has failed in the '${failedStageName}' stage. Please investigate the issue.",
+                         to: "adem.boujnah@esprit.tn",
+                         mimeType: 'text/html'
             }
-
-            if (failedStageName == null) {
-                failedStageName = "Unknown"
-            }
-
-            emailext subject: "Pipeline Failed in Stage: ${currentBuild.fullDisplayName}",
-                     body: "The pipeline '${currentBuild.fullDisplayName}' has failed in the '${failedStageName}' stage. Please investigate the issue.",
-                     to: "adem.boujnah@esprit.tn",
-                     mimeType: 'text/html'
         }
     }
-}
-
 }
