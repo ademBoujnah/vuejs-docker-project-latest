@@ -56,15 +56,27 @@ pipeline {
     }
 
     post {
-    always {
-        script {
-            currentBuild.result = currentBuild.result ?: 'SUCCESS'
-        }
-    }
-
     failure {
         script {
-            def failedStageName = currentBuild.rawBuild.getActions(hudson.model.CauseAction).find { it._causes[0].class.simpleName == 'CauseOfInterruption' }._causes[0].shortDescription
+            def failedStageName = null
+            def currentResult = currentBuild.currentResult
+
+            if (currentResult instanceof hudson.model.Result) {
+                def failedActions = currentBuild.rawBuild.actions.findAll { action ->
+                    action instanceof hudson.tasks.junit.TestResultAction
+                }
+
+                if (!failedActions.isEmpty()) {
+                    // Use the first failed test result to determine the failed stage.
+                    def failedTestAction = failedActions[0]
+                    failedStageName = failedTestAction.getDisplayName()
+                }
+            }
+
+            if (failedStageName == null) {
+                failedStageName = "Unknown"
+            }
+
             emailext subject: "Pipeline Failed in Stage: ${currentBuild.fullDisplayName}",
                      body: "The pipeline '${currentBuild.fullDisplayName}' has failed in the '${failedStageName}' stage. Please investigate the issue.",
                      to: "adem.boujnah@esprit.tn",
