@@ -61,20 +61,17 @@ pipeline {
             def failedStageName = null
 
             try {
-                // Attempt to capture the failed stage name
-                def failedStage = catchError {
-                    // Placeholder stage with a deliberate error to capture the stage name
-                    stage('Capture Failed Stage') {
-                        steps {
-                            script {
-                                error('Stage failed deliberately to capture its name')
-                            }
-                        }
-                    }
+                // Get the build causes
+                def causes = currentBuild.rawBuild.getCauses()
+
+                // Find the stage cause among the build causes
+                def stageCause = causes.find { cause ->
+                    cause instanceof org.jenkinsci.plugins.workflow.support.causes.StageFailureCause
                 }
 
-                if (failedStage) {
-                    failedStageName = failedStage.displayName
+                // If a stage cause is found, use its stage name
+                if (stageCause) {
+                    failedStageName = stageCause.getShortDescription()
                 }
             } catch (Exception e) {
                 // Handle exceptions
@@ -90,6 +87,6 @@ pipeline {
                      mimeType: 'text/html'
         }
     }
- }
+}
 
 }
