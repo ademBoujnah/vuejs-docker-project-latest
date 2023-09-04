@@ -8,9 +8,10 @@ pipeline {
 
     environment {
         DOCKER_IMAGE_VERSION = 'V0'
-        CURRENT_STAGE = ''
         // Define dockerImageTag at the top level
         DOCKER_IMAGE_TAG = ""
+        // Define CURRENT_STAGE at the top level
+        CURRENT_STAGE = ''
     }
 
     stages {
@@ -36,7 +37,7 @@ pipeline {
             steps {
                 script {
                     CURRENT_STAGE = 'Code Analysis'
-                    def scannerHome = tool 'SonarQubeScannerm'
+                    def scannerHome = tool 'SonarQubeScanner'
                     try {
                         withSonarQubeEnv('SonarQube') {
                             sh "${scannerHome}/bin/sonar-scanner"
