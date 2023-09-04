@@ -19,7 +19,7 @@ pipeline {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     script {
-                        def scannerHome = tool 'SonarQubeScanner'
+                        def scannerHome = tool 'SonarQubeScannerm'
                         withSonarQubeEnv('SonarQube') {
                             sh "${scannerHome}/bin/sonar-scanner"
                         }
