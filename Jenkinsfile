@@ -5,9 +5,11 @@ pipeline {
         // Ensure that environment variables persist between builds
         buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '5'))
     }
+    parameters {
+        string(name: 'DOCKER_IMAGE_VERSION', defaultValue: '1', description: 'Docker image version')
+    }
 
     environment {
-        DOCKER_IMAGE_VERSION = '1'
         // Define dockerImageTag at the top level
         DOCKER_IMAGE_TAG = ""
         // Define CURRENT_STAGE at the top level
@@ -21,7 +23,7 @@ pipeline {
         steps {
              script {
                  
-                 VERSION = "${DOCKER_IMAGE_VERSION.toInteger() + 1}"
+                 VERSION = params.DOCKER_IMAGE_VERSION.toInteger() + 1
                   try {
                       sh "docker build -t ${NAME} ."
                       sh "docker tag ${NAME}:latest ${NAME}:${VERSION}"
