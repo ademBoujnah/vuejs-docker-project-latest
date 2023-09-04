@@ -19,9 +19,17 @@ pipeline {
     stages {
         stage('Build') {
         steps {
-            VERSION = sh(script: 'echo $((DOCKER_IMAGE_VERSION.toInteger() + 1))', returnStdout: true).trim()
-            sh "docker build -t ${NAME} ."
-            sh "docker tag ${NAME}:latest ${NAME}:${VERSION}"
+             script {
+                 
+                 VERSION = sh(script: 'echo $((DOCKER_IMAGE_VERSION.toInteger() + 1))', returnStdout: true).trim()
+                  try {
+                      sh "docker build -t ${NAME} ."
+            } catch (Exception e) {
+                      currentBuild.result = 'FAILURE'
+                      error("Build failed: ${e.message}")
+            }
+                 sh "docker tag ${NAME}:latest ${NAME}:${VERSION}"
+             }
         }
     }
 
