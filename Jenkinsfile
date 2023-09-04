@@ -7,7 +7,7 @@ pipeline {
     }
 
     environment {
-        DOCKER_IMAGE_VERSION = '0'
+        DOCKER_IMAGE_VERSION = '1'
         // Define dockerImageTag at the top level
         DOCKER_IMAGE_TAG = ""
         // Define CURRENT_STAGE at the top level
