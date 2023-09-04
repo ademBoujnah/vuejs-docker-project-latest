@@ -10,7 +10,7 @@ pipeline {
         // Define CURRENT_STAGE at the top level
         CURRENT_STAGE = ''
         NAME = "ademboujnah/vuejs-app"
-        VERSION = env.VERSION ?: '1'        
+        VERSION = "${VERSION ?: '1'}"    
     }
 
     stages {
