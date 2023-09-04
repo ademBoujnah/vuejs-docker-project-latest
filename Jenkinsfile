@@ -13,7 +13,8 @@ pipeline {
         // Define CURRENT_STAGE at the top level
         CURRENT_STAGE = ''
         NAME = "ademboujnah/vuejs-app"
-        VERSION = "${env.BUILD_ID}-${env.GIT_COMMIT}"
+        //VERSION = "${env.BUILD_ID}"
+        VERSION = "${bamboo.buildNumber}"
         IMAGE = "${NAME}:${VERSION}"
     }
 
