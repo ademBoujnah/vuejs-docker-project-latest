@@ -2,24 +2,23 @@ pipeline {
     agent any
 
     environment {
-         DOCKER_IMAGE_VERSION = 'V1'
-        // Initialize a variable to track the current stage
+        DOCKER_IMAGE_VERSION = 'V1'
         CURRENT_STAGE = ''
+        // Define dockerImageTag at the top level
+        DOCKER_IMAGE_TAG = ""
     }
 
     stages {
         stage('Build') {
             steps {
                 script {
-                    // Increment the version counter
                     DOCKER_IMAGE_VERSION = "V${DOCKER_IMAGE_VERSION.replace('V', '').toInteger() + 1}"
-                    def dockerImageTag = "ademboujnah/vuejs-app:${DOCKER_IMAGE_VERSION}"
-
-                    // Set the current stage name
+                    // Assign the dockerImageTag at the top level
+                    DOCKER_IMAGE_TAG = "ademboujnah/vuejs-app:${DOCKER_IMAGE_VERSION}"
+                    
                     CURRENT_STAGE = 'Build'
                     try {
-                        // Build the Vue.js app in a Docker container and tag it with the version
-                        sh "docker build -t $dockerImageTag ."
+                        sh "docker build -t $DOCKER_IMAGE_TAG ."
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
                         error("Build failed: ${e.message}")
@@ -31,12 +30,10 @@ pipeline {
         stage('Code Analysis') {
             steps {
                 script {
-                    // Set the current stage name
                     CURRENT_STAGE = 'Code Analysis'
                     def scannerHome = tool 'SonarQubeScanner'
                     try {
                         withSonarQubeEnv('SonarQube') {
-                            // Run SonarQube code analysis
                             sh "${scannerHome}/bin/sonar-scanner"
                         }
                     } catch (Exception e) {
@@ -50,13 +47,12 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    // Set the current stage name
                     CURRENT_STAGE = 'Push to Docker Hub'
                     try {
-                        // Authenticate with Docker Hub using credentials.
                         withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials-id', passwordVariable: 'DOCKERHUB_PASSWORD', usernameVariable: 'DOCKERHUB_USERNAME')]) {
                             sh "docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD"
-                            sh "docker push $dockerImageTag"
+                            // Use the DOCKER_IMAGE_TAG variable defined at the top level
+                            sh "docker push $DOCKER_IMAGE_TAG"
                         }
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
@@ -70,7 +66,6 @@ pipeline {
     post {
         failure {
             script {
-                // Use the custom CURRENT_STAGE variable to capture the failed stage name
                 def failedStageName = env.CURRENT_STAGE ?: "Unknown"
 
                 emailext subject: "Pipeline Failed in Stage: ${currentBuild.fullDisplayName}",
