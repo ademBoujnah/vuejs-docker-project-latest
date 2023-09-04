@@ -1,10 +1,10 @@
 pipeline {
     agent any
-    
+
     environment {
         DOCKER_IMAGE_TAG = "ademboujnah/vuejs-app:latest"
     }
-    
+
     stages {
         stage('Build') {
             environment {
@@ -25,7 +25,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Code Analysis') {
             environment {
                 STAGE_STATUS = 'SUCCESS'
@@ -45,7 +45,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Push to Docker Hub') {
             environment {
                 STAGE_STATUS = 'SUCCESS'
@@ -73,12 +73,26 @@ pipeline {
     post {
         failure {
             script {
-                def failedStage = currentBuild.rawBuild.getCauses().findAll { it instanceof hudson.model.CauseOfInterruption }?.collect { it.getShortDescription() }?.join(", ") ?: 'Unknown Stage'
-                
-                emailext subject: "Pipeline Failed in Stage(s): ${failedStage}",
-                         body: "The pipeline '${currentBuild.fullDisplayName}' has failed in the stage(s): ${failedStage}. Please investigate the issue.",
-                         to: "adem.boujnah@esprit.tn",
-                         mimeType: 'text/html'
+                def failedStages = []
+                if (STAGE_STATUS == 'FAILURE') {
+                    failedStages.add("Build")
+                }
+                if (STAGE_STATUS == 'FAILURE') {
+                    failedStages.add("Code Analysis")
+                }
+                if (STAGE_STATUS == 'FAILURE') {
+                    failedStages.add("Push to Docker Hub")
+                }
+
+                def failedStageStr = failedStages.join(", ")
+                if (failedStageStr.isEmpty()) {
+                    failedStageStr = 'Unknown Stage'
+                }
+
+                emailext subject: "Pipeline Failed in Stage(s): ${failedStageStr}",
+                    body: "The pipeline '${currentBuild.fullDisplayName}' has failed in the stage(s): ${failedStageStr}. Please investigate the issue.",
+                    to: "adem.boujnah@esprit.tn",
+                    mimeType: 'text/html'
             }
         }
     }
