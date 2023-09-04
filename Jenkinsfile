@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    options {
+        // Ensure that environment variables persist between builds
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '5'))
+    }
+
     environment {
         DOCKER_IMAGE_VERSION = 'V1'
         CURRENT_STAGE = ''
