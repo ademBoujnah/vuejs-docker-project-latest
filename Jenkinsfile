@@ -1,13 +1,8 @@
 pipeline {
     agent any
 
-    options {
-        // Ensure that environment variables persist between builds
-        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '5'))
-    }
-    parameters {
-        string(name: 'DOCKER_IMAGE_VERSION', defaultValue: '1', description: 'Docker image version')
-    }
+   
+   
 
     environment {
         // Define dockerImageTag at the top level
@@ -15,7 +10,7 @@ pipeline {
         // Define CURRENT_STAGE at the top level
         CURRENT_STAGE = ''
         NAME = "ademboujnah/vuejs-app"
-        VERSION = "1"        
+        VERSION = env.VERSION ?: '1'        
     }
 
     stages {
@@ -23,7 +18,7 @@ pipeline {
         steps {
              script {
                  
-                 VERSION = params.DOCKER_IMAGE_VERSION.toInteger() + 1
+                 VERSION = "${VERSION.toInteger() + 1}"
                   try {
                       sh "docker build -t ${NAME} ."
                       sh "docker tag ${NAME}:latest ${NAME}:${VERSION}"
