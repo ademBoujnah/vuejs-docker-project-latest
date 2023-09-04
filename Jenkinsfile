@@ -21,7 +21,7 @@ pipeline {
         steps {
              script {
                  
-                 VERSION = sh(script: 'echo $((DOCKER_IMAGE_VERSION.toInteger() + 1))', returnStdout: true).trim()
+                 VERSION = "${DOCKER_IMAGE_VERSION.toInteger() + 1}"
                   try {
                       sh "docker build -t ${NAME} ."
                       sh "docker tag ${NAME}:latest ${NAME}:${VERSION}"
