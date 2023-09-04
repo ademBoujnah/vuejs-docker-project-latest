@@ -13,16 +13,14 @@ pipeline {
         // Define CURRENT_STAGE at the top level
         CURRENT_STAGE = ''
         NAME = "ademboujnah/vuejs-app"
-        //VERSION = "${env.BUILD_ID}"
-        VERSION = "${bamboo.buildNumber}"
-        IMAGE = "${NAME}:${VERSION}"
+        VERSION = "1"        
     }
 
     stages {
         stage('Build') {
         steps {
             echo "Running ${VERSION} on ${env.JENKINS_URL}"
-            echo "for brnach ${env.BRANCH_NAME}"
+            VERSION = sh(script: 'echo $((DOCKER_IMAGE_VERSION.toInteger() + 1))', returnStdout: true).trim()
             sh "docker build -t ${NAME} ."
             sh "docker tag ${NAME}:latest ${NAME}:${VERSION}"
         }
