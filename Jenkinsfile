@@ -15,7 +15,7 @@ pipeline {
                     CURRENT_STAGE = 'Build'
                     try {
                         // Build the Vue.js app in a Docker container.
-                        sh 'docker build -t $DOCKER_IMAGE_TAG .'
+                        sh 'docker buildh -t $DOCKER_IMAGE_TAG .'
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
                         error("Build failed: ${e.message}")
