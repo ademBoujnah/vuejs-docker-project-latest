@@ -12,26 +12,21 @@ pipeline {
         DOCKER_IMAGE_TAG = ""
         // Define CURRENT_STAGE at the top level
         CURRENT_STAGE = ''
+        NAME = "ademboujnah/vuejs-app"
+        VERSION = "${env.BUILD_ID}-${env.GIT_COMMIT}"
+        IMAGE = "${NAME}:${VERSION}"
     }
 
     stages {
         stage('Build') {
-            steps {
-                script {
-                    DOCKER_IMAGE_VERSION = "V${DOCKER_IMAGE_VERSION.replace('V', '').toInteger() + 1}"
-                    // Assign the dockerImageTag at the top level
-                    DOCKER_IMAGE_TAG = "ademboujnah/vuejs-app:${DOCKER_IMAGE_VERSION}"
-                    
-                    CURRENT_STAGE = 'Build'
-                    try {
-                        sh "docker buildah -t $DOCKER_IMAGE_TAG ."
-                    } catch (Exception e) {
-                        currentBuild.result = 'FAILURE'
-                        error("Build failed: ${e.message}")
-                    }
-                }
-            }
+        steps {
+            echo "Running ${VERSION} on ${env.JENKINS_URL}"
+            git branch: "${BRANCH}",  .....
+            echo "for brnach ${env.BRANCH_NAME}"
+            sh "docker build -t ${NAME} ."
+            sh "docker tag ${NAME}:latest ${IMAGE_REPO}/${NAME}:${VERSION}"
         }
+    }
 
         stage('Code Analysis') {
             steps {
@@ -58,7 +53,7 @@ pipeline {
                         withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials-id', passwordVariable: 'DOCKERHUB_PASSWORD', usernameVariable: 'DOCKERHUB_USERNAME')]) {
                             sh "docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD"
                             // Use the DOCKER_IMAGE_TAG variable defined at the top level
-                            sh "docker push $DOCKER_IMAGE_TAG"
+                            sh "docker push $IMAGE"
                         }
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
