@@ -68,9 +68,7 @@ pipeline {
                 }
             }
 
-            if (failedStageName == null) {
-                failedStageName = "Unknown"
-            }
+            
 
             emailext subject: "Pipeline Failed in Stage: ${currentBuild.fullDisplayName}",
                      body: "The pipeline '${currentBuild.fullDisplayName}' has failed in the '${failedStageName}' stage. Please investigate the issue.",
