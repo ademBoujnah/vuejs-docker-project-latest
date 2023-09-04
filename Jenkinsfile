@@ -73,7 +73,7 @@ pipeline {
         failure {
             script {
                 sh "echo $CURRENT_STAGE"
-                def failedStageName = env.CURRENT_STAGE ?: "Unknown"
+                def failedStageName = CURRENT_STAGE ?: "Unknown"
 
                 emailext subject: "Pipeline Failed in Stage: ${currentBuild.fullDisplayName}",
                          body: "The pipeline '${currentBuild.fullDisplayName}' has failed in the '${failedStageName}' stage. Please investigate the issue.",
