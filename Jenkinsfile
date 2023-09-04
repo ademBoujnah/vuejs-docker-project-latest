@@ -29,7 +29,7 @@ pipeline {
                 script {
                     // Set the current stage name
                     CURRENT_STAGE = 'Code Analysis'
-                    def scannerHome = tool 'SonarQubeScannerm'
+                    def scannerHome = tool 'SonarQubeScanner'
                     try {
                         withSonarQubeEnv('SonarQube') {
                             // Run SonarQube code analysis
