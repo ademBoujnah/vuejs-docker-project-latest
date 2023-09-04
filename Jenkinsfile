@@ -13,7 +13,7 @@ pipeline {
                         // Build the Vue.js app in a Docker container.
                         sh 'docker buildh -t $DOCKER_IMAGE_TAG .'
                     } catch (Exception e) {
-                        currentBuild.result = 'FAILURE'
+                        currentBuild.result = 'Build'
                         error("Build failed: ${e.message}")
                     }
                 }
@@ -30,7 +30,7 @@ pipeline {
                             sh "${scannerHome}/bin/sonar-scanner"
                         }
                     } catch (Exception e) {
-                        currentBuild.result = 'FAILURE'
+                        currentBuild.result = 'Code Analysis'
                         error("Code Analysis failed: ${e.message}")
                     }
                 }
@@ -47,7 +47,7 @@ pipeline {
                             sh "docker push $DOCKER_IMAGE_TAG"
                         }
                     } catch (Exception e) {
-                        currentBuild.result = 'FAILURE'
+                        currentBuild.result = 'Push to Docker Hub'
                         error("Push to Docker Hub failed: ${e.message}")
                     }
                 }
