@@ -7,7 +7,7 @@ pipeline {
     }
 
     environment {
-        DOCKER_IMAGE_VERSION = '1'
+        DOCKER_IMAGE_VERSION = '0'
         // Define dockerImageTag at the top level
         DOCKER_IMAGE_TAG = ""
         // Define CURRENT_STAGE at the top level
@@ -59,7 +59,7 @@ pipeline {
                         withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials-id', passwordVariable: 'DOCKERHUB_PASSWORD', usernameVariable: 'DOCKERHUB_USERNAME')]) {
                             sh "docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD"
                             // Use the DOCKER_IMAGE_TAG variable defined at the top level
-                            sh "docker push $IMAGE"
+                            sh "docker push $NAME:$VERSION"
                         }
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
