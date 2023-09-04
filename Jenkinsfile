@@ -11,7 +11,7 @@ pipeline {
         // Define dockerImageTag at the top level
         DOCKER_IMAGE_TAG = ""
         // Define CURRENT_STAGE at the top level
-        CURRENT_STAGE = 'etat 0'
+        CURRENT_STAGE = ''
     }
 
     stages {
@@ -24,7 +24,7 @@ pipeline {
                     
                     CURRENT_STAGE = 'Build'
                     try {
-                        sh "docker build -t $DOCKER_IMAGE_TAG ."
+                        sh "docker buildah -t $DOCKER_IMAGE_TAG ."
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
                         error("Build failed: ${e.message}")
@@ -37,7 +37,7 @@ pipeline {
             steps {
                 script {
                     CURRENT_STAGE = 'Code Analysis'
-                    def scannerHome = tool 'SonarQubeScannerm'
+                    def scannerHome = tool 'SonarQubeScanner'
                     try {
                         withSonarQubeEnv('SonarQube') {
                             sh "${scannerHome}/bin/sonar-scanner"
@@ -72,7 +72,6 @@ pipeline {
     post {
         failure {
             script {
-                sh "echo $CURRENT_STAGE"
                 def failedStageName = CURRENT_STAGE ?: "Unknown"
 
                 emailext subject: "Pipeline Failed in Stage: ${currentBuild.fullDisplayName}",
