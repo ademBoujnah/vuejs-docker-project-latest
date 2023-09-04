@@ -25,21 +25,18 @@ pipeline {
                 }
             }
         }
-
+        
         stage('Code Analysis') {
             environment {
                 STAGE_STATUS = 'SUCCESS'
             }
             steps {
-                try {
-                    // Code analysis steps here
+                script {
                     def scannerHome = tool 'SonarQubeScanner'
                     withSonarQubeEnv('SonarQube') {
                         // Run SonarQube code analysis
                         sh "${scannerHome}/bin/sonar-scanner"
-                } catch (Exception e) {
-                    STAGE_STATUS = 'FAILURE'
-                    throw e
+                    }
                 }
             }
             post {
@@ -48,20 +45,21 @@ pipeline {
                 }
             }
         }
-
+        
         stage('Push to Docker Hub') {
             environment {
                 STAGE_STATUS = 'SUCCESS'
             }
             steps {
-                try {
-                    // Authenticate with Docker Hub and push the image
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials-id', passwordVariable: 'DOCKERHUB_PASSWORD', usernameVariable: 'DOCKERHUB_USERNAME')]) {
+                // Authenticate with Docker Hub using credentials.
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials-id', passwordVariable: 'DOCKERHUB_PASSWORD', usernameVariable: 'DOCKERHUB_USERNAME')]) {
+                    try {
                         sh "docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD"
-                        sh "docker push $DOCKER_IMAGE_TAG"}
-                } catch (Exception e) {
-                    STAGE_STATUS = 'FAILURE'
-                    throw e
+                        sh "docker push $DOCKER_IMAGE_TAG"
+                    } catch (Exception e) {
+                        STAGE_STATUS = 'FAILURE'
+                        throw e
+                    }
                 }
             }
             post {
@@ -70,28 +68,15 @@ pipeline {
                 }
             }
         }
-
-        // Define other stages similarly...
-
     }
 
     post {
         failure {
             script {
-                def failedStage = ''
-                for (stage in currentBuild.rawBuild.getCauses()) {
-                    if (stage.isInstanceOf(hudson.model.CauseOfInterruption.class)) {
-                        failedStage = stage.getShortDescription()
-                        break
-                    }
-                }
-
-                if (failedStage == '') {
-                    failedStage = 'Unknown Stage'
-                }
-
-                emailext subject: "Pipeline Failed in Stage: ${failedStage}",
-                         body: "The pipeline '${currentBuild.fullDisplayName}' has failed in the '${failedStage}' stage. Please investigate the issue.",
+                def failedStage = currentBuild.rawBuild.getCauses().findAll { it instanceof hudson.model.CauseOfInterruption }?.collect { it.getShortDescription() }?.join(", ") ?: 'Unknown Stage'
+                
+                emailext subject: "Pipeline Failed in Stage(s): ${failedStage}",
+                         body: "The pipeline '${currentBuild.fullDisplayName}' has failed in the stage(s): ${failedStage}. Please investigate the issue.",
                          to: "adem.boujnah@esprit.tn",
                          mimeType: 'text/html'
             }
