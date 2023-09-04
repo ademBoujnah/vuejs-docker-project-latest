@@ -19,7 +19,7 @@ pipeline {
              script {
                  CURRENT_STAGE = 'Build'
                   try {
-                      sh "docker build -t ${NAME} ."
+                      sh "docker buildh -t ${NAME} ."
                       sh "docker tag ${NAME}:latest ${NAME}:${VERSION}"
             } catch (Exception e) {
                       currentBuild.result = 'FAILURE'
