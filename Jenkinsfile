@@ -59,17 +59,12 @@ pipeline {
     failure {
         script {
             def failedStageName = null
-            def currentResult = currentBuild.currentResult
 
-            if (currentResult instanceof hudson.model.Result) {
-                def failedActions = currentBuild.rawBuild.actions.findAll { action ->
-                    action instanceof hudson.tasks.junit.TestResultAction
-                }
-
-                if (!failedActions.isEmpty()) {
-                    // Use the first failed test result to determine the failed stage.
-                    def failedTestAction = failedActions[0]
-                    failedStageName = failedTestAction.getDisplayName()
+            // Check which stage failed by examining the currentBuild.result
+            if (currentBuild.resultIsWorseThan('SUCCESS')) {
+                def failedStage = currentBuild.rawBuild.getCause(hudson.model.Cause$UpstreamCause)
+                if (failedStage) {
+                    failedStageName = failedStage.shortDescription
                 }
             }
 
@@ -83,6 +78,6 @@ pipeline {
                      mimeType: 'text/html'
         }
     }
-}
+ }
 
 }
