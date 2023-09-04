@@ -19,7 +19,6 @@ pipeline {
     stages {
         stage('Build') {
         steps {
-            echo "Running ${VERSION} on ${env.JENKINS_URL}"
             VERSION = sh(script: 'echo $((DOCKER_IMAGE_VERSION.toInteger() + 1))', returnStdout: true).trim()
             sh "docker build -t ${NAME} ."
             sh "docker tag ${NAME}:latest ${NAME}:${VERSION}"
