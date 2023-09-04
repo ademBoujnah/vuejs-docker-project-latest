@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE_TAG = "ademboujnah/vuejs-app:latest"
+         DOCKER_IMAGE_VERSION = 'V1'
         // Initialize a variable to track the current stage
         CURRENT_STAGE = ''
     }
@@ -11,11 +11,15 @@ pipeline {
         stage('Build') {
             steps {
                 script {
+                    // Increment the version counter
+                    DOCKER_IMAGE_VERSION = "V${DOCKER_IMAGE_VERSION.replace('V', '').toInteger() + 1}"
+                    def dockerImageTag = "ademboujnah/vuejs-app:${DOCKER_IMAGE_VERSION}"
+
                     // Set the current stage name
                     CURRENT_STAGE = 'Build'
                     try {
-                        // Build the Vue.js app in a Docker container.
-                        sh 'docker build -t $DOCKER_IMAGE_TAG .'
+                        // Build the Vue.js app in a Docker container and tag it with the version
+                        sh "docker build -t $dockerImageTag ."
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
                         error("Build failed: ${e.message}")
