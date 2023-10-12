@@ -11,7 +11,7 @@ pipeline {
     }
 
     stages {
-        stage('Git Clone') {
+        stage('Build') {
         steps {
              script {
                  CURRENT_STAGE = 'Build'
@@ -27,7 +27,7 @@ pipeline {
         }
     }
 
-        stage('SSH Into K8s Server') {
+        stage('Code Analysis') {
             steps {
                 script {
                     CURRENT_STAGE = 'Code Analysis'
@@ -44,7 +44,7 @@ pipeline {
             }
         }
 
-        stage('Put deployment files onto k8smaster') {
+        stage('Push to Docker Hub') {
             steps {
                 script {
                     CURRENT_STAGE = 'Push to Docker Hub'
@@ -62,38 +62,6 @@ pipeline {
             }
         }
     }
-        stage('Deploy the application') {
-            steps {
-                script {
-                    CURRENT_STAGE = 'Code Analysis'
-                    def scannerHome = tool 'SonarQubeScanner'
-                    try {
-                        withSonarQubeEnv('SonarQube') {
-                            sh "${scannerHome}/bin/sonar-scanner"
-                        }
-                    } catch (Exception e) {
-                        currentBuild.result = 'FAILURE'
-                        error("Code Analysis failed: ${e.message}")
-                    }
-                }
-            }
-        }
-        stage('Monitoring the application') {
-            steps {
-                script {
-                    CURRENT_STAGE = 'Code Analysis'
-                    def scannerHome = tool 'SonarQubeScanner'
-                    try {
-                        withSonarQubeEnv('SonarQube') {
-                            sh "${scannerHome}/bin/sonar-scanner"
-                        }
-                    } catch (Exception e) {
-                        currentBuild.result = 'FAILURE'
-                        error("Code Analysis failed: ${e.message}")
-                    }
-                }
-            }
-        }
 
     post {
         failure {
