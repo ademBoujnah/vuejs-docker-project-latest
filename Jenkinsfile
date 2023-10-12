@@ -62,7 +62,7 @@ pipeline {
             }
         }
     }
-     stage('Deploy the application') {
+        stage('Deploy the application') {
             steps {
                 script {
                     CURRENT_STAGE = 'Code Analysis'
@@ -78,7 +78,7 @@ pipeline {
                 }
             }
         }
-     stage('Monitoring the application') {
+        stage('Monitoring the application') {
             steps {
                 script {
                     CURRENT_STAGE = 'Code Analysis'
